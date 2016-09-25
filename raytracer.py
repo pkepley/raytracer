@@ -112,6 +112,9 @@ class raytracer:
 			total_travel_time = h * i + tau_star * h
 			x_final           = x_old + tau_star * (x_cur - x_old)
 
+			for k in range(i+1,n):
+				xs[k,:] = x_final
+
 		else:
 			total_travel_time = T
 
