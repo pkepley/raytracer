@@ -1,0 +1,6 @@
+# ignore emacs files:
+[#]*[#]
+*~
+
+# ignore .pyc files:
+*.pyc
