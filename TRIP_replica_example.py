@@ -1,10 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy.io as sio
 from raytracer import raytracer
 
 def c(x):
-	return (2.0 + x[1]
-			- 1.5 * np.exp( -4.0 * ((x[0] * x[0]) + (x[1] - 1.5) * (x[1] - 1.5))))
+	#return (1.0+0.5*x[1]-0.75*np.exp(-4.0*((x[0]*x[0])+(x[1]-0.75)*(x[1]-0.75))))
+	#return (1.0+0.15*np.cos( 0.5*np.pi*x[0] + 1.5*np.pi*x[1]))
+	#return (1.0 + x[1])
+	#return 1.0+0.25*np.exp(-4.0*((x[1]-0.5)*(x[1]-0.5)))
+	#return 1.0+0.5*np.exp(-64.0*((x[1]-0.5)*(x[1]-0.5)))
+	#return 1.0 - 0.5* np.exp(-16.0*((x[0]*x[0]) + (x[1]-0.5)*(x[1]-0.5)));
+	return 1.0 + 0.5*x[1] - 0.5*np.exp(-4.0*x[0]*x[0] - 4.0*(x[1]-0.375)*(x[1]-0.375));
 
 rt = raytracer(c,2)
 
@@ -19,7 +25,7 @@ def plot_background(xlo, xhi, ylo, yhi, nx, ny):
 	zz = np.flipud(zz.T)
 	fig, ax = plt.subplots()
 	cax = ax.imshow(zz, extent=[xlo, xhi, ylo, yhi], cmap = plt.get_cmap('Blues_r'));
-	fig.colorbar(cax,  shrink=.5, pad=.2, aspect=10)
+	fig.colorbar(cax, fraction=0.046, pad=0.04, aspect=7.25)
 	ax.axis([xlo, xhi, ylo, yhi]);
 	ax.set_ylim([yhi, ylo]);
 	return fig, ax
@@ -86,19 +92,34 @@ def add_isochrones_to_plot(fig, ax, data, n_steps, stride):
 		ax.plot(x_level, y_level, c='g')
 
 if __name__ == '__main__':
-	fig,ax = plot_background(-4.0, 4.0, 0.0, 3.0, 100,100);	
-	data = add_normals_to_plot(fig, ax, 2.0, 31, 200, -4.0, 4.0);
-	add_isochrones_to_plot(fig, ax, data, 200, 3);
-	fig.savefig('./img/TRIP_BNC.png', bbox_inches='tight')
+	fig,ax = plot_background(-2.0, 2.0, 0.0, 1.25, 100,100);	
+	fig.savefig('./img/TRIP_model.png', bbox_inches='tight')
 
-	x0 = np.array([-3.5, 0.0]);
-	xi0 = np.array([1, 1.25]);
-	T = 4.0;
-	n_rays = 31;
+	fig,ax = plot_background(-1.5, 1.5, 0.0, 1.25, 100, 100);	
+	T = .75
+	n_rays = 61
+	n_steps = 101
+	data = add_normals_to_plot(fig, ax, T, n_rays, n_steps, -1.5, 1.5);
+	
+	# # save:
+	# x_rt = np.zeros((n_steps, n_rays))
+	# y_rt = np.zeros((n_steps, n_rays))
+	# for i, datum in enumerate(data):
+	# 	x_rt[:,i] = datum['xs'][:,0];
+	# 	y_rt[:,i] = datum['xs'][:,1];		
+	# sio.savemat('./coords.mat', {'x_rt' : x_rt, 'y_rt' : y_rt})
+
+	add_isochrones_to_plot(fig, ax, data, n_steps, 4);
+	fig.savefig('./img/TRIP_BNC.png', bbox_inches='tight')
+	
+	x0 = np.array([-.85, 0.0]);
+	#xi0 = np.array([1, 1.25]);
+	T = 2.0;
+	n_rays = 11;
 	n_steps = 100;
-	theta_lo, theta_hi =  0.7, 1.15
-	fig,ax = plot_background(-4.0, 4.0, 0.0 ,3.0,100,100);
+	theta_lo, theta_hi =  np.pi/6, np.pi/3
+	fig,ax = plot_background(-1.5, 1.5, 0.0, 1.25, 100, 100);
 	data = add_fan_to_plot(fig, ax, x0, T, n_rays, n_steps, theta_lo, theta_hi)
-	fig.savefig('./img/TRIP_Reeplica.png', bbox_inches='tight')
+	fig.savefig('./img/TRIP_Replica.png', bbox_inches='tight')
 
 	plt.show();
